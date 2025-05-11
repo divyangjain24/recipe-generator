@@ -9,8 +9,6 @@ API_KEY = st.secrets["API"]  # Securely loaded from Streamlit secrets
 st.set_page_config(page_title="AI Recipe Generator", page_icon="🍳", layout="centered")
 
 # --- Session State Init ---
-if "saved_recipes" not in st.session_state:
-    st.session_state.saved_recipes = {}
 if "generated_recipe" not in st.session_state:
     st.session_state.generated_recipe = ""
 if "current_recipe_name" not in st.session_state:
@@ -42,15 +40,6 @@ h1, h2, h3 {
     font-size: 16px;
     line-height: 1.6;
     margin-bottom: 20px;
-}
-.save-button {
-    background: linear-gradient(90deg, #ff6a00, #ee0979);
-    color: white;
-    padding: 10px 25px;
-    border: none;
-    border-radius: 10px;
-    font-weight: bold;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 </style>
 """, unsafe_allow_html=True)
@@ -94,33 +83,3 @@ if st.button("Generate Recipe"):
 # --- Display Generated Recipe ---
 if st.session_state.generated_recipe:
     st.markdown(f"<div class='recipe-box'>{st.session_state.generated_recipe}</div>", unsafe_allow_html=True)
-    if st.button("💾 Save Recipe"):
-        name = st.session_state.current_recipe_name
-        st.session_state.saved_recipes[name] = st.session_state.generated_recipe
-        st.success(f"Recipe for '{name}' saved!")
-
-# --- Sidebar with Search and Filter ---
-with st.sidebar:
-    st.markdown("### 📚 Saved Recipes")
-
-    search_query = st.text_input("🔍 Search Recipes").lower()
-
-    filtered_recipes = {
-        name: content
-        for name, content in st.session_state.saved_recipes.items()
-        if search_query in name.lower()
-    }
-
-    if filtered_recipes:
-        for name, content in filtered_recipes.items():
-            with st.expander(name):
-                st.markdown(f"<div class='recipe-box'>{content}</div>", unsafe_allow_html=True)
-                if st.button(f"🗑️ Delete {name}", key=f"delete_{name}"):
-                    del st.session_state.saved_recipes[name]
-                    st.success(f"Deleted recipe: {name}")
-                    st.rerun()
-    else:
-        if search_query:
-            st.info("No matching recipes found.")
-        else:
-            st.info("No recipes saved yet.")
