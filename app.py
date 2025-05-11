@@ -2,14 +2,10 @@ import streamlit as st
 import requests
 import json
 import os
-from dotenv import load_dotenv
-
-# --- Load Environment Variables ---
-load_dotenv()
-API_KEY = os.getenv("API")
 
 # --- Constants ---
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
+API_KEY = st.secrets["API"]  # Securely loaded from Streamlit secrets
 RECIPE_FILE = "saved_recipes.json"
 
 # --- Helper Functions ---
