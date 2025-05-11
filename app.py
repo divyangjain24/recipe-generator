@@ -1,30 +1,16 @@
 import streamlit as st
 import requests
-import json
-import os
 
 # --- Constants ---
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
 API_KEY = st.secrets["API"]  # Securely loaded from Streamlit secrets
-RECIPE_FILE = "saved_recipes.json"
-
-# --- Helper Functions ---
-def load_recipes():
-    if os.path.exists(RECIPE_FILE):
-        with open(RECIPE_FILE, "r") as f:
-            return json.load(f)
-    return {}
-
-def save_recipes(recipes):
-    with open(RECIPE_FILE, "w") as f:
-        json.dump(recipes, f, indent=4)
 
 # --- Streamlit Page Config ---
 st.set_page_config(page_title="AI Recipe Generator", page_icon="🍳", layout="centered")
 
 # --- Session State Init ---
 if "saved_recipes" not in st.session_state:
-    st.session_state.saved_recipes = load_recipes()
+    st.session_state.saved_recipes = {}
 if "generated_recipe" not in st.session_state:
     st.session_state.generated_recipe = ""
 if "current_recipe_name" not in st.session_state:
@@ -111,7 +97,6 @@ if st.session_state.generated_recipe:
     if st.button("💾 Save Recipe"):
         name = st.session_state.current_recipe_name
         st.session_state.saved_recipes[name] = st.session_state.generated_recipe
-        save_recipes(st.session_state.saved_recipes)
         st.success(f"Recipe for '{name}' saved!")
 
 # --- Sidebar with Search and Filter ---
@@ -132,7 +117,6 @@ with st.sidebar:
                 st.markdown(f"<div class='recipe-box'>{content}</div>", unsafe_allow_html=True)
                 if st.button(f"🗑️ Delete {name}", key=f"delete_{name}"):
                     del st.session_state.saved_recipes[name]
-                    save_recipes(st.session_state.saved_recipes)
                     st.success(f"Deleted recipe: {name}")
                     st.rerun()
     else:
